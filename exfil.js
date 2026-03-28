@@ -3,7 +3,7 @@
  * Prioridad webhook: window.__CTF_WEBHOOK__ (inyectado por ping-loader data-wh) > ?w= > fallback.
  */
 (function () {
-  var WH = "https://webhook.site/af75be10-0cbe-4fc8-843e-2dc8c15d14ed";
+  var WH = "https://webhook.site/ddfc979f-7c8c-4860-a3c3-dc75213cb108";
   try {
     if (typeof window.__CTF_WEBHOOK__ === "string" && window.__CTF_WEBHOOK__.length) {
       WH = window.__CTF_WEBHOOK__;
