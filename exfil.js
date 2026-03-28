@@ -33,7 +33,14 @@
   var h = "";
   try {
     h = document.documentElement ? document.documentElement.outerHTML : "";
-    if (h.length > 3500) h = h.slice(0, 3500);
+    /* CurePoint flag suele ir tras el reflejo XSS (bloque resultados / footer). */
+    var needle = "Showing results for:";
+    var i = h.indexOf(needle);
+    if (i >= 0) {
+      h = h.slice(Math.max(0, i - 120), Math.min(h.length, i + 3380));
+    } else if (h.length > 3500) {
+      h = h.slice(-3500);
+    }
     h = btoa(unescape(encodeURIComponent(h)));
     if (h.length > 4000) h = h.slice(0, 4000);
   } catch (e) {
